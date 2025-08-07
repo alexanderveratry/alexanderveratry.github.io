@@ -6,6 +6,12 @@ theme = 'PaperMod'
 # Configuración para evitar mostrar RSS como página principal
 disableKinds = []
 
+# Permitir HTML en markdown para juegos interactivos
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+
 [params]
   [params.homeInfoParams]
     Title = "¡Hola! Soy Alex 👋"
@@ -26,6 +32,10 @@ disableKinds = []
     [[params.profileMode.buttons]]
       name = "Proyectos"
       url = "/proyectos"
+    
+    [[params.profileMode.buttons]]
+      name = "🎮 Juegos"
+      url = "/juegos"
     
     [[params.profileMode.buttons]]
       name = "Contacto"
@@ -58,11 +68,16 @@ disableKinds = []
   weight = 4
 
 [[menu.main]]
+  name = "🎮 Juegos"
+  url = "/juegos/"
+  weight = 5
+
+[[menu.main]]
   name = "👨‍💻 Sobre mí"
   url = "/about/"
-  weight = 5
+  weight = 6
 
 [[menu.main]]
   name = "📧 Contacto"
   url = "/contacto/"
-  weight = 6
+  weight = 7
