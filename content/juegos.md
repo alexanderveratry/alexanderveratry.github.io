@@ -65,7 +65,6 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
         <div id="game-board"></div>
         <div id="game-status"></div>
     </div>
-</div>
 
 <style>
 #color-chain-game {
@@ -562,11 +561,13 @@ document.addEventListener('DOMContentLoaded', function() {
         startButton.addEventListener('click', () => {
             menu.style.display = 'none';
             gameSection.style.display = 'block';
+
             setTimeout(() => {
                 if (document.getElementById('game-board')) {
                     game = new ColorChainGame();
                 }
             }, 100);
+
         });
     }
 });
