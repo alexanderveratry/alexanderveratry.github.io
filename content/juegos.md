@@ -561,9 +561,13 @@ document.addEventListener('DOMContentLoaded', function() {
         startButton.addEventListener('click', () => {
             menu.style.display = 'none';
             gameSection.style.display = 'block';
-            if (document.getElementById('game-board')) {
-                game = new ColorChainGame();
-            }
+
+            setTimeout(() => {
+                if (document.getElementById('game-board')) {
+                    game = new ColorChainGame();
+                }
+            }, 100);
+
         });
     }
 });
