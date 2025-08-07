@@ -293,3 +293,10 @@ function resetGame() {
     }
 }
 
+// Exponer controles del juego para ser usados desde el HTML
+window.ColorChain = {
+    toggleAudio,
+    changeVolume,
+    resetGame,
+};
+
