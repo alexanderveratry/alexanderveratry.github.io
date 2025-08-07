@@ -17,15 +17,28 @@ Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo col
 
 ### 🎯 Cómo jugar:
 1. Haz clic en cualquier cuadrado del tablero 10x10
-2. El cuadrado cambiará de color aleatoriamente
+2. El cuadrado cambiará al **próximo color** de la cola
 3. Todos los cuadrados adyacentes del mismo color también cambiarán
-4. El objetivo es hacer que todo el tablero sea del mismo color
-5. ¡Hazlo en el menor tiempo posible!
+4. Puedes ver los **próximos 2 colores** para planificar tu estrategia
+5. El objetivo es hacer que todo el tablero sea del mismo color
+6. **🎵 Activa la música** para una experiencia más inmersiva
+7. ¡Hazlo en el menor tiempo posible!
 
 <div id="color-chain-game">
     <div id="game-container">
         <div id="game-header">
             <div id="timer">⏱️ Tiempo: 00:00</div>
+            <div id="next-colors">
+                <span>Próximos colores:</span>
+                <div id="color-queue">
+                    <div class="next-color" id="next-color-1"></div>
+                    <div class="next-color" id="next-color-2"></div>
+                </div>
+            </div>
+            <div id="audio-controls">
+                <button id="audio-toggle" onclick="toggleAudio()">🎵 Reproducir música</button>
+                <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="changeVolume(this.value)">
+            </div>
             <button id="reset-btn" onclick="resetGame()">🔄 Jugar de nuevo</button>
         </div>
         <div id="game-board"></div>
@@ -51,6 +64,111 @@ Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo col
     color: white;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#next-colors {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+#next-colors span {
+    font-size: 0.9em;
+    font-weight: bold;
+}
+
+#color-queue {
+    display: flex;
+    gap: 8px;
+}
+
+.next-color {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.next-color.red {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+}
+
+.next-color.green {
+    background: linear-gradient(135deg, #51cf66, #40c057);
+}
+
+.next-color.blue {
+    background: linear-gradient(135deg, #339af0, #228be6);
+}
+
+#audio-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+}
+
+#audio-toggle {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#audio-toggle:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-1px);
+}
+
+#audio-toggle.playing {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.5);
+}
+
+#audio-toggle.muted {
+    background: rgba(244, 67, 54, 0.3);
+    border-color: rgba(244, 67, 54, 0.5);
+}
+
+#volume-slider {
+    width: 80px;
+    height: 4px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+#volume-slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+#volume-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 #timer {
@@ -146,7 +264,33 @@ Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo col
 @media (max-width: 600px) {
     #game-header {
         flex-direction: column;
-        gap: 10px;
+        gap: 15px;
+    }
+    
+    #next-colors {
+        order: -1; /* Mover los próximos colores arriba en móvil */
+    }
+    
+    #next-colors span {
+        font-size: 0.8em;
+    }
+    
+    .next-color {
+        width: 25px;
+        height: 25px;
+    }
+    
+    #audio-controls {
+        order: -2; /* Mover controles de audio al top en móvil */
+    }
+    
+    #audio-toggle {
+        font-size: 0.8em;
+        padding: 6px 12px;
+    }
+    
+    #volume-slider {
+        width: 60px;
     }
     
     #game-board {
@@ -165,15 +309,70 @@ class ColorChainGame {
         this.gameRunning = false;
         this.timerInterval = null;
         this.animationFrame = null;
+        this.colorQueue = []; // Cola de próximos colores
+        this.audioElement = null;
+        this.audioEnabled = false;
         
         this.initGame();
+        this.initAudio();
+    }
+    
+    initAudio() {
+        // Cargar archivo MP3 específico desde la carpeta static
+        this.audioElement = new Audio('/audio/background-music.mp3');
+        this.audioElement.loop = true;
+        this.audioElement.volume = 0.5; // Volumen inicial del 50%
+        
+        console.log('Audio del juego inicializado: background-music.mp3');
+    }
+    
+    stopAllAudio() {
+        // Detener música
+        if (this.audioElement) {
+            this.audioElement.pause();
+            this.audioElement.currentTime = 0;
+        }
+        
+        this.audioEnabled = false;
+        const button = document.getElementById('audio-toggle');
+        button.classList.remove('playing');
+        button.classList.add('muted');
     }
     
     initGame() {
         this.generateBoard();
+        this.generateColorQueue();
         this.renderBoard();
+        this.updateColorQueue();
         this.updateStatus("¡Haz clic en un cuadrado para comenzar!");
         this.resetTimer();
+    }
+    
+    generateColorQueue() {
+        // Generar una cola de 10 colores para tener siempre próximos colores disponibles
+        this.colorQueue = [];
+        for (let i = 0; i < 10; i++) {
+            this.colorQueue.push(this.colors[Math.floor(Math.random() * this.colors.length)]);
+        }
+    }
+    
+    getNextColor() {
+        // Obtener el primer color de la cola
+        const nextColor = this.colorQueue.shift();
+        // Agregar un nuevo color al final de la cola
+        this.colorQueue.push(this.colors[Math.floor(Math.random() * this.colors.length)]);
+        return nextColor;
+    }
+    
+    updateColorQueue() {
+        // Actualizar la visualización de los próximos 2 colores
+        const nextColor1 = document.getElementById('next-color-1');
+        const nextColor2 = document.getElementById('next-color-2');
+        
+        if (nextColor1 && nextColor2) {
+            nextColor1.className = `next-color ${this.colorQueue[0]}`;
+            nextColor2.className = `next-color ${this.colorQueue[1]}`;
+        }
     }
     
     generateBoard() {
@@ -206,11 +405,12 @@ class ColorChainGame {
         }
         
         const originalColor = this.board[row][col];
-        const newColor = this.getRandomColor();
+        const newColor = this.getNextColor(); // Usar el próximo color de la cola
         
         // Cambiar color del cuadrado clickeado y sus adyacentes del mismo color
         this.changeConnectedCells(row, col, originalColor, newColor);
         this.renderBoard();
+        this.updateColorQueue(); // Actualizar la visualización de próximos colores
         
         if (this.checkWin()) {
             this.endGame(true);
@@ -324,6 +524,7 @@ class ColorChainGame {
         this.stopTimer();
         this.gameStartTime = null;
         this.resetTimer();
+        this.generateColorQueue(); // Regenerar cola de colores
         this.initGame();
     }
 }
@@ -340,6 +541,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 100);
 });
 
+// Función global para controlar el audio
+async function toggleAudio() {
+    if (!game || !game.audioElement) return;
+    
+    const button = document.getElementById('audio-toggle');
+    
+    if (game.audioElement.paused) {
+        // Reproducir música
+        try {
+            await game.audioElement.play();
+            game.audioEnabled = true;
+            button.textContent = '🔇 Pausar música';
+            button.classList.remove('muted');
+            button.classList.add('playing');
+        } catch (error) {
+            console.error('Error al reproducir audio:', error);
+            alert('Error al reproducir la música. Asegúrate de que el archivo /audio/background-music.mp3 exista.');
+        }
+    } else {
+        // Pausar música
+        game.audioElement.pause();
+        game.audioEnabled = false;
+        button.textContent = '🎵 Reproducir música';
+        button.classList.remove('playing');
+        button.classList.add('muted');
+    }
+}
+
+function changeVolume(value) {
+    if (!game || !game.audioElement) return;
+    
+    // Volumen para música del juego
+    game.audioElement.volume = value / 100; // Convertir a rango 0-1
+}
+
 function resetGame() {
     if (game) {
         game.reset();
@@ -354,10 +590,12 @@ function resetGame() {
 ¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!
 
 ### 💡 Estrategias:
-- Observa el tablero antes de hacer el primer clic
-- Intenta identificar grupos grandes del mismo color
-- Planifica movimientos que afecten la mayor cantidad de cuadrados
-- Los colores se cambian aleatoriamente, así que a veces necesitarás suerte
+- **Planifica con anticipación**: Observa los próximos 2 colores antes de hacer clic
+- **Piensa en secuencias**: ¿Cómo puedes usar los próximos colores de manera óptima?
+- **Observa el tablero**: Identifica grupos grandes del mismo color
+- **Timing perfecto**: A veces es mejor esperar un color específico de la cola
+- **Combos efectivos**: Planifica movimientos que afecten la mayor cantidad de cuadrados
+- **No hay azar**: Ahora cada movimiento es calculado, ¡usa la estrategia!
 
 ---
 
