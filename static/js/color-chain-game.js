@@ -1,4 +1,4 @@
-(function () {
+
 class ColorChainGame {
     constructor() {
         this.board = [];
@@ -248,11 +248,9 @@ function initMenu() {
     }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMenu);
-} else {
-    initMenu();
-}
+
+initMenu();
+
 
 // Función global para controlar el audio
 async function toggleAudio() {
@@ -295,5 +293,3 @@ function resetGame() {
     }
 }
 
-window.ColorChain = { toggleAudio, changeVolume, resetGame };
-})();

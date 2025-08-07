@@ -320,6 +320,9 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
 </style>
 <script src="/js/color-chain-game.js"></script>
 
+
+<script src="/js/color-chain-game.js" defer></script>
+
 <h2>🏆 Puntuaciones y Récords</h2>
 <p>¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!</p>
 
