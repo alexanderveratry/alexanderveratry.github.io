@@ -3,6 +3,10 @@ languageCode = 'es'
 title = 'Blog de Alex - Desarrollo & Tecnología'
 theme = 'PaperMod'
 
+# Optimización para GitHub Pages
+canonifyURLs = true
+relativeURLs = false
+
 # Configuración para evitar mostrar RSS como página principal
 disableKinds = []
 
