@@ -3,6 +3,10 @@
 /resources/_gen/
 /assets/jsconfig.json
 hugo_stats.json
+/categories/
+/posts/
+/tags/
+/sitemap.xml
 
 # Hugo build lock
 .hugo_build.lock
