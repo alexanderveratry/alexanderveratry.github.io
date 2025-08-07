@@ -1,0 +1,69 @@
+baseURL = 'https://alexanderveratry.github.io/'
+languageCode = 'es'
+title = 'Blog de Alex - Desarrollo & Tecnología'
+theme = 'PaperMod'
+
+[params]
+  homeInfoParams = { 
+    Title = "¡Hola! Soy Alex 👋", 
+    Content = "Desarrollador apasionado por la tecnología. Aquí comparto mis conocimientos sobre programación, finanzas, proyectos y experimentos técnicos. ¡Bienvenido a mi espacio digital! 🚀" 
+  }
+  
+  # Habilitar modo perfil en la página principal
+  profileMode = {
+    enabled = true
+    title = "Alex Vera"
+    subtitle = "Desarrollador Full Stack & Entusiasta de la Tecnología"
+    imageUrl = "avatar.jpg"
+    imageTitle = "Alex Vera"
+    buttons = [
+      {
+        name = "Ver Blog",
+        url = "/posts"
+      },
+      {
+        name = "Proyectos",
+        url = "/proyectos"
+      },
+      {
+        name = "Contacto",
+        url = "/contacto"
+      }
+    ]
+  }
+
+  # SEO y social
+  description = "Blog técnico sobre desarrollo, programación y tecnología"
+  keywords = ["desarrollo", "programación", "python", "javascript", "tecnología", "blog técnico"]
+  author = "Alex Vera"
+
+[menu]
+[[menu.main]]
+  name = "🏠 Inicio"
+  url = "/"
+  weight = 1
+
+[[menu.main]]
+  name = "📝 Blog"
+  url = "/posts/"
+  weight = 2
+
+[[menu.main]]
+  name = "💼 Proyectos"
+  url = "/proyectos/"
+  weight = 3
+
+[[menu.main]]
+  name = "🛠️ Tecnologías"
+  url = "/tecnologias/"
+  weight = 4
+
+[[menu.main]]
+  name = "👨‍💻 Sobre mí"
+  url = "/about/"
+  weight = 5
+
+[[menu.main]]
+  name = "📧 Contacto"
+  url = "/contacto/"
+  weight = 6
