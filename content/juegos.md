@@ -549,10 +549,10 @@ class ColorChainGame {
     }
 }
 
-// Inicializar el juego cuando se carga la página
+// Controlador principal del juego y el menú
 let game;
 
-document.addEventListener('DOMContentLoaded', function() {
+function initMenu() {
     const menu = document.getElementById('game-menu');
     const gameSection = document.getElementById('color-chain-game');
     const startButton = document.getElementById('start-simple-game');
@@ -562,15 +562,18 @@ document.addEventListener('DOMContentLoaded', function() {
             menu.style.display = 'none';
             gameSection.style.display = 'block';
 
-            setTimeout(() => {
-                if (document.getElementById('game-board')) {
-                    game = new ColorChainGame();
-                }
-            }, 100);
-
+            if (document.getElementById('game-board')) {
+                game = new ColorChainGame();
+            }
         });
     }
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMenu);
+} else {
+    initMenu();
+}
 
 // Función global para controlar el audio
 async function toggleAudio() {
