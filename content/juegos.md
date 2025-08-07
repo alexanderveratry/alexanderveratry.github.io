@@ -10,42 +10,21 @@ description: "Colección de juegos web interactivos desarrollados en JavaScript 
 Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos desarrollados con HTML, CSS y JavaScript.
 
 ---
-<style>
-#game-menu {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    margin: 20px 0;
-}
 
-#game-menu button {
-    padding: 10px 20px;
-    cursor: pointer;
-}
-</style>
+## 🟦 Color Chain Reaction
 
-<div id="game-menu">
-  <h2>Selecciona un juego</h2>
-  <button id="start-simple-game">Simple Game</button>
-  <button disabled>Próximo juego (muy pronto)</button>
-  <button disabled>Otro juego (muy pronto)</button>
-</div>
+Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo color mediante reacciones en cadena.
 
-<div id="color-chain-game" style="display:none;">
-<h2>Simple Game</h2>
-<p>Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo color mediante reacciones en cadena.</p>
-<h3>🎯 Cómo jugar:</h3>
-<ol>
-  <li>Haz clic en cualquier cuadrado del tablero 10x10</li>
-  <li>El cuadrado cambiará al <strong>próximo color</strong> de la cola</li>
-  <li>Todos los cuadrados adyacentes del mismo color también cambiarán</li>
-  <li>Puedes ver los <strong>próximos 2 colores</strong> para planificar tu estrategia</li>
-  <li>El objetivo es hacer que todo el tablero sea del mismo color</li>
-  <li><strong>🎵 Activa la música</strong> para una experiencia más inmersiva</li>
-  <li>¡Hazlo en el menor tiempo posible!</li>
-</ol>
+### 🎯 Cómo jugar:
+1. Haz clic en cualquier cuadrado del tablero 10x10
+2. El cuadrado cambiará al **próximo color** de la cola
+3. Todos los cuadrados adyacentes del mismo color también cambiarán
+4. Puedes ver los **próximos 2 colores** para planificar tu estrategia
+5. El objetivo es hacer que todo el tablero sea del mismo color
+6. **🎵 Activa la música** para una experiencia más inmersiva
+7. ¡Hazlo en el menor tiempo posible!
 
+<div id="color-chain-game">
     <div id="game-container">
         <div id="game-header">
             <div id="timer">⏱️ Tiempo: 00:00</div>
@@ -57,14 +36,15 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
                 </div>
             </div>
             <div id="audio-controls">
-                <button id="audio-toggle" onclick="ColorChain.toggleAudio()">🎵 Reproducir música</button>
-                <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="ColorChain.changeVolume(this.value)">
+                <button id="audio-toggle" onclick="toggleAudio()">🎵 Reproducir música</button>
+                <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="changeVolume(this.value)">
             </div>
-            <button id="reset-btn" onclick="ColorChain.resetGame()">🔄 Jugar de nuevo</button>
+            <button id="reset-btn" onclick="resetGame()">🔄 Jugar de nuevo</button>
         </div>
         <div id="game-board"></div>
         <div id="game-status"></div>
     </div>
+</div>
 
 <style>
 #color-chain-game {
@@ -318,20 +298,305 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
     }
 }
 </style>
-<script src="/js/color-chain-game.js" defer></script>
 
-<h2>🏆 Puntuaciones y Récords</h2>
-<p>¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!</p>
+<script>
+class ColorChainGame {
+    constructor() {
+        this.board = [];
+        this.colors = ['red', 'green', 'blue'];
+        this.size = 10;
+        this.gameStartTime = null;
+        this.gameRunning = false;
+        this.timerInterval = null;
+        this.animationFrame = null;
+        this.colorQueue = []; // Cola de próximos colores
+        this.audioElement = null;
+        this.audioEnabled = false;
+        
+        this.initGame();
+        this.initAudio();
+    }
+    
+    initAudio() {
+        // Cargar archivo MP3 específico desde la carpeta static
+        this.audioElement = new Audio('/audio/background-music.mp3');
+        this.audioElement.loop = true;
+        this.audioElement.volume = 0.5; // Volumen inicial del 50%
+        
+        console.log('Audio del juego inicializado: background-music.mp3');
+    }
+    
+    stopAllAudio() {
+        // Detener música
+        if (this.audioElement) {
+            this.audioElement.pause();
+            this.audioElement.currentTime = 0;
+        }
+        
+        this.audioEnabled = false;
+        const button = document.getElementById('audio-toggle');
+        button.classList.remove('playing');
+        button.classList.add('muted');
+    }
+    
+    initGame() {
+        this.generateBoard();
+        this.generateColorQueue();
+        this.renderBoard();
+        this.updateColorQueue();
+        this.updateStatus("¡Haz clic en un cuadrado para comenzar!");
+        this.resetTimer();
+    }
+    
+    generateColorQueue() {
+        // Generar una cola de 10 colores para tener siempre próximos colores disponibles
+        this.colorQueue = [];
+        for (let i = 0; i < 10; i++) {
+            this.colorQueue.push(this.colors[Math.floor(Math.random() * this.colors.length)]);
+        }
+    }
+    
+    getNextColor() {
+        // Obtener el primer color de la cola
+        const nextColor = this.colorQueue.shift();
+        // Agregar un nuevo color al final de la cola
+        this.colorQueue.push(this.colors[Math.floor(Math.random() * this.colors.length)]);
+        return nextColor;
+    }
+    
+    updateColorQueue() {
+        // Actualizar la visualización de los próximos 2 colores
+        const nextColor1 = document.getElementById('next-color-1');
+        const nextColor2 = document.getElementById('next-color-2');
+        
+        if (nextColor1 && nextColor2) {
+            nextColor1.className = `next-color ${this.colorQueue[0]}`;
+            nextColor2.className = `next-color ${this.colorQueue[1]}`;
+        }
+    }
+    
+    generateBoard() {
+        this.board = [];
+        for (let i = 0; i < this.size; i++) {
+            this.board[i] = [];
+            for (let j = 0; j < this.size; j++) {
+                this.board[i][j] = this.colors[Math.floor(Math.random() * this.colors.length)];
+            }
+        }
+    }
+    
+    renderBoard() {
+        const gameBoard = document.getElementById('game-board');
+        gameBoard.innerHTML = '';
+        
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                const cell = document.createElement('button');
+                cell.className = `game-cell ${this.board[i][j]}`;
+                cell.onclick = () => this.cellClick(i, j);
+                gameBoard.appendChild(cell);
+            }
+        }
+    }
+    
+    cellClick(row, col) {
+        if (!this.gameRunning) {
+            this.startGame();
+        }
+        
+        const originalColor = this.board[row][col];
+        const newColor = this.getNextColor(); // Usar el próximo color de la cola
+        
+        // Cambiar color del cuadrado clickeado y sus adyacentes del mismo color
+        this.changeConnectedCells(row, col, originalColor, newColor);
+        this.renderBoard();
+        this.updateColorQueue(); // Actualizar la visualización de próximos colores
+        
+        if (this.checkWin()) {
+            this.endGame(true);
+        }
+    }
+    
+    changeConnectedCells(row, col, originalColor, newColor) {
+        if (row < 0 || row >= this.size || col < 0 || col >= this.size) return;
+        if (this.board[row][col] !== originalColor) return;
+        
+        this.board[row][col] = newColor;
+        
+        // Cambiar células adyacentes (arriba, abajo, izquierda, derecha)
+        this.changeConnectedCells(row - 1, col, originalColor, newColor);
+        this.changeConnectedCells(row + 1, col, originalColor, newColor);
+        this.changeConnectedCells(row, col - 1, originalColor, newColor);
+        this.changeConnectedCells(row, col + 1, originalColor, newColor);
+    }
+    
+    getRandomColor() {
+        return this.colors[Math.floor(Math.random() * this.colors.length)];
+    }
+    
+    checkWin() {
+        const firstColor = this.board[0][0];
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] !== firstColor) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    startGame() {
+        this.gameRunning = true;
+        this.gameStartTime = performance.now(); // Usar performance.now() para mayor precisión
+        this.startTimer();
+        this.updateStatus("🎮 ¡Juego en progreso! Haz que todos los cuadrados sean del mismo color.");
+    }
+    
+    endGame(won) {
+        this.gameRunning = false;
+        this.stopTimer();
+        
+        if (won) {
+            const timeElapsed = this.getTimeElapsed();
+            this.updateStatus(`🎉 ¡Felicitaciones! Completaste el juego en ${timeElapsed}`, 'won');
+        }
+    }
+    
+    startTimer() {
+        // Función recursiva para un cronómetro más preciso
+        const updateClock = () => {
+            if (this.gameRunning) {
+                this.updateTimer();
+                this.animationFrame = requestAnimationFrame(updateClock);
+            }
+        };
+        updateClock();
+        
+        // Backup con setInterval cada segundo
+        this.timerInterval = setInterval(() => {
+            if (this.gameRunning) {
+                this.updateTimer();
+            }
+        }, 1000);
+    }
+    
+    stopTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
+        }
+    }
+    
+    resetTimer() {
+        this.stopTimer();
+        this.gameStartTime = null;
+        document.getElementById('timer').textContent = '⏱️ Tiempo: 00:00';
+    }
+    
+    updateTimer() {
+        const timeElapsed = this.getTimeElapsed();
+        document.getElementById('timer').textContent = `⏱️ Tiempo: ${timeElapsed}`;
+    }
+    
+    getTimeElapsed() {
+        if (!this.gameStartTime) return '00:00';
+        
+        // Usar performance.now() para cálculo más preciso
+        const elapsed = Math.floor((performance.now() - this.gameStartTime) / 1000);
+        const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+        const seconds = (elapsed % 60).toString().padStart(2, '0');
+        return `${minutes}:${seconds}`;
+    }
+    
+    updateStatus(message, type = 'playing') {
+        const statusElement = document.getElementById('game-status');
+        statusElement.textContent = message;
+        statusElement.className = `status-${type}`;
+    }
+    
+    reset() {
+        this.gameRunning = false;
+        this.stopTimer();
+        this.gameStartTime = null;
+        this.resetTimer();
+        this.generateColorQueue(); // Regenerar cola de colores
+        this.initGame();
+    }
+}
 
-<h3>💡 Estrategias:</h3>
-<ul>
-  <li><strong>Planifica con anticipación</strong>: Observa los próximos 2 colores antes de hacer clic</li>
-  <li><strong>Piensa en secuencias</strong>: ¿Cómo puedes usar los próximos colores de manera óptima?</li>
-  <li><strong>Observa el tablero</strong>: Identifica grupos grandes del mismo color</li>
-  <li><strong>Timing perfecto</strong>: A veces es mejor esperar un color específico de la cola</li>
-  <li><strong>Combos efectivos</strong>: Planifica movimientos que afecten la mayor cantidad de cuadrados</li>
-  <li><strong>No hay azar</strong>: Ahora cada movimiento es calculado, ¡usa la estrategia!</li>
-</ul>
+// Inicializar el juego cuando se carga la página
+let game;
 
-<p><em>¿Te gustó este juego? ¡Déjame saber en los comentarios si quieres que cree más juegos interactivos!</em></p>
-</div>
+document.addEventListener('DOMContentLoaded', function() {
+    // Esperar un poco para asegurarse de que el DOM esté completamente cargado
+    setTimeout(() => {
+        if (document.getElementById('game-board')) {
+            game = new ColorChainGame();
+        }
+    }, 100);
+});
+
+// Función global para controlar el audio
+async function toggleAudio() {
+    if (!game || !game.audioElement) return;
+    
+    const button = document.getElementById('audio-toggle');
+    
+    if (game.audioElement.paused) {
+        // Reproducir música
+        try {
+            await game.audioElement.play();
+            game.audioEnabled = true;
+            button.textContent = '🔇 Pausar música';
+            button.classList.remove('muted');
+            button.classList.add('playing');
+        } catch (error) {
+            console.error('Error al reproducir audio:', error);
+            alert('Error al reproducir la música. Asegúrate de que el archivo /audio/background-music.mp3 exista.');
+        }
+    } else {
+        // Pausar música
+        game.audioElement.pause();
+        game.audioEnabled = false;
+        button.textContent = '🎵 Reproducir música';
+        button.classList.remove('playing');
+        button.classList.add('muted');
+    }
+}
+
+function changeVolume(value) {
+    if (!game || !game.audioElement) return;
+    
+    // Volumen para música del juego
+    game.audioElement.volume = value / 100; // Convertir a rango 0-1
+}
+
+function resetGame() {
+    if (game) {
+        game.reset();
+    }
+}
+</script>
+
+---
+
+## 🏆 Puntuaciones y Récords
+
+¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!
+
+### 💡 Estrategias:
+- **Planifica con anticipación**: Observa los próximos 2 colores antes de hacer clic
+- **Piensa en secuencias**: ¿Cómo puedes usar los próximos colores de manera óptima?
+- **Observa el tablero**: Identifica grupos grandes del mismo color
+- **Timing perfecto**: A veces es mejor esperar un color específico de la cola
+- **Combos efectivos**: Planifica movimientos que afecten la mayor cantidad de cuadrados
+- **No hay azar**: Ahora cada movimiento es calculado, ¡usa la estrategia!
+
+---
+
+*¿Te gustó este juego? ¡Déjame saber en los comentarios si quieres que cree más juegos interactivos!*
