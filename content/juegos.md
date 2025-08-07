@@ -10,21 +10,42 @@ description: "Colección de juegos web interactivos desarrollados en JavaScript 
 Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos desarrollados con HTML, CSS y JavaScript.
 
 ---
+<style>
+#game-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+}
 
-## 🟦 Color Chain Reaction
+#game-menu button {
+    padding: 10px 20px;
+    cursor: pointer;
+}
+</style>
 
-Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo color mediante reacciones en cadena.
+<div id="game-menu">
+  <h2>Selecciona un juego</h2>
+  <button id="start-simple-game">Simple Game</button>
+  <button disabled>Próximo juego (muy pronto)</button>
+  <button disabled>Otro juego (muy pronto)</button>
+</div>
 
-### 🎯 Cómo jugar:
-1. Haz clic en cualquier cuadrado del tablero 10x10
-2. El cuadrado cambiará al **próximo color** de la cola
-3. Todos los cuadrados adyacentes del mismo color también cambiarán
-4. Puedes ver los **próximos 2 colores** para planificar tu estrategia
-5. El objetivo es hacer que todo el tablero sea del mismo color
-6. **🎵 Activa la música** para una experiencia más inmersiva
-7. ¡Hazlo en el menor tiempo posible!
+<div id="color-chain-game" style="display:none;">
+<h2>Simple Game</h2>
+<p>Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo color mediante reacciones en cadena.</p>
+<h3>🎯 Cómo jugar:</h3>
+<ol>
+  <li>Haz clic en cualquier cuadrado del tablero 10x10</li>
+  <li>El cuadrado cambiará al <strong>próximo color</strong> de la cola</li>
+  <li>Todos los cuadrados adyacentes del mismo color también cambiarán</li>
+  <li>Puedes ver los <strong>próximos 2 colores</strong> para planificar tu estrategia</li>
+  <li>El objetivo es hacer que todo el tablero sea del mismo color</li>
+  <li><strong>🎵 Activa la música</strong> para una experiencia más inmersiva</li>
+  <li>¡Hazlo en el menor tiempo posible!</li>
+</ol>
 
-<div id="color-chain-game">
     <div id="game-container">
         <div id="game-header">
             <div id="timer">⏱️ Tiempo: 00:00</div>
@@ -44,7 +65,6 @@ Un juego de puzzle donde debes hacer que todos los cuadrados tengan el mismo col
         <div id="game-board"></div>
         <div id="game-status"></div>
     </div>
-</div>
 
 <style>
 #color-chain-game {
@@ -533,12 +553,19 @@ class ColorChainGame {
 let game;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Esperar un poco para asegurarse de que el DOM esté completamente cargado
-    setTimeout(() => {
-        if (document.getElementById('game-board')) {
-            game = new ColorChainGame();
-        }
-    }, 100);
+    const menu = document.getElementById('game-menu');
+    const gameSection = document.getElementById('color-chain-game');
+    const startButton = document.getElementById('start-simple-game');
+
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            menu.style.display = 'none';
+            gameSection.style.display = 'block';
+            if (document.getElementById('game-board')) {
+                game = new ColorChainGame();
+            }
+        });
+    }
 });
 
 // Función global para controlar el audio
@@ -582,21 +609,18 @@ function resetGame() {
     }
 }
 </script>
+<h2>🏆 Puntuaciones y Récords</h2>
+<p>¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!</p>
 
----
+<h3>💡 Estrategias:</h3>
+<ul>
+  <li><strong>Planifica con anticipación</strong>: Observa los próximos 2 colores antes de hacer clic</li>
+  <li><strong>Piensa en secuencias</strong>: ¿Cómo puedes usar los próximos colores de manera óptima?</li>
+  <li><strong>Observa el tablero</strong>: Identifica grupos grandes del mismo color</li>
+  <li><strong>Timing perfecto</strong>: A veces es mejor esperar un color específico de la cola</li>
+  <li><strong>Combos efectivos</strong>: Planifica movimientos que afecten la mayor cantidad de cuadrados</li>
+  <li><strong>No hay azar</strong>: Ahora cada movimiento es calculado, ¡usa la estrategia!</li>
+</ul>
 
-## 🏆 Puntuaciones y Récords
-
-¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!
-
-### 💡 Estrategias:
-- **Planifica con anticipación**: Observa los próximos 2 colores antes de hacer clic
-- **Piensa en secuencias**: ¿Cómo puedes usar los próximos colores de manera óptima?
-- **Observa el tablero**: Identifica grupos grandes del mismo color
-- **Timing perfecto**: A veces es mejor esperar un color específico de la cola
-- **Combos efectivos**: Planifica movimientos que afecten la mayor cantidad de cuadrados
-- **No hay azar**: Ahora cada movimiento es calculado, ¡usa la estrategia!
-
----
-
-*¿Te gustó este juego? ¡Déjame saber en los comentarios si quieres que cree más juegos interactivos!*
+<p><em>¿Te gustó este juego? ¡Déjame saber en los comentarios si quieres que cree más juegos interactivos!</em></p>
+</div>
