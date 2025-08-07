@@ -57,10 +57,10 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
                 </div>
             </div>
             <div id="audio-controls">
-                <button id="audio-toggle" onclick="toggleAudio()">🎵 Reproducir música</button>
-                <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="changeVolume(this.value)">
+                <button id="audio-toggle" onclick="ColorChain.toggleAudio()">🎵 Reproducir música</button>
+                <input type="range" id="volume-slider" min="0" max="100" value="50" onchange="ColorChain.changeVolume(this.value)">
             </div>
-            <button id="reset-btn" onclick="resetGame()">🔄 Jugar de nuevo</button>
+            <button id="reset-btn" onclick="ColorChain.resetGame()">🔄 Jugar de nuevo</button>
         </div>
         <div id="game-board"></div>
         <div id="game-status"></div>
@@ -318,8 +318,11 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
     }
 }
 </style>
+<script src="/js/color-chain-game.js"></script>
+
 
 <script src="/js/color-chain-game.js" defer></script>
+
 <h2>🏆 Puntuaciones y Récords</h2>
 <p>¿Puedes completar el juego en menos de 2 minutos? ¡Comparte tu mejor tiempo en los comentarios!</p>
 

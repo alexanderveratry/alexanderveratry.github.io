@@ -248,7 +248,9 @@ function initMenu() {
     }
 }
 
+
 initMenu();
+
 
 // Función global para controlar el audio
 async function toggleAudio() {
@@ -290,3 +292,4 @@ function resetGame() {
         game.reset();
     }
 }
+
