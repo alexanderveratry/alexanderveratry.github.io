@@ -318,9 +318,6 @@ Bienvenido a mi colección de juegos web. Aquí encontrarás diferentes juegos d
     }
 }
 </style>
-<script src="/js/color-chain-game.js"></script>
-
-
 <script src="/js/color-chain-game.js" defer></script>
 
 <h2>🏆 Puntuaciones y Récords</h2>

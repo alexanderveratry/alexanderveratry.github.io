@@ -249,7 +249,7 @@ function initMenu() {
 }
 
 
-initMenu();
+document.addEventListener('DOMContentLoaded', initMenu);
 
 
 // Función global para controlar el audio
