@@ -1,6 +1,6 @@
 ---
 title: "🎮 Juegos Interactivos"
-date: 2025-08-06T21:45:00-04:00
+date: 2025-08-05T21:45:00-04:00
 draft: false
 description: "Colección de juegos web interactivos desarrollados en JavaScript - Color Chain Reaction"
 ---
