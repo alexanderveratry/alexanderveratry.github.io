@@ -35,6 +35,12 @@ Este blog está dedicado a compartir conocimientos, experiencias y proyectos rel
 - ✅ **Contenido inicial** publicado
 - 🔄 **Desarrollo activo** - Agregando nuevo contenido regularmente
 
+## 📄 Documentos de Contexto
+
+- [Contexto inicial](docs/contexto.md)
+- [Contexto actualizado](docs/contexto_actualizado.md)
+
+
 ## 📁 Estructura del Proyecto
 
 ```
