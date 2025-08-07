@@ -3,34 +3,33 @@ languageCode = 'es'
 title = 'Blog de Alex - Desarrollo & Tecnología'
 theme = 'PaperMod'
 
+# Configuración para evitar mostrar RSS como página principal
+disableKinds = []
+
 [params]
-  homeInfoParams = { 
-    Title = "¡Hola! Soy Alex 👋", 
-    Content = "Desarrollador apasionado por la tecnología. Aquí comparto mis conocimientos sobre programación, finanzas, proyectos y experimentos técnicos. ¡Bienvenido a mi espacio digital! 🚀" 
-  }
+  [params.homeInfoParams]
+    Title = "¡Hola! Soy Alex 👋"
+    Content = "Desarrollador apasionado por la tecnología. Aquí comparto mis conocimientos sobre programación, finanzas, proyectos y experimentos técnicos. ¡Bienvenido a mi espacio digital! 🚀"
   
   # Habilitar modo perfil en la página principal
-  profileMode = {
+  [params.profileMode]
     enabled = true
     title = "Alex Vera"
     subtitle = "Desarrollador Full Stack & Entusiasta de la Tecnología"
     imageUrl = "avatar.jpg"
     imageTitle = "Alex Vera"
-    buttons = [
-      {
-        name = "Ver Blog",
-        url = "/posts"
-      },
-      {
-        name = "Proyectos",
-        url = "/proyectos"
-      },
-      {
-        name = "Contacto",
-        url = "/contacto"
-      }
-    ]
-  }
+    
+    [[params.profileMode.buttons]]
+      name = "Ver Blog"
+      url = "/posts"
+    
+    [[params.profileMode.buttons]]
+      name = "Proyectos"
+      url = "/proyectos"
+    
+    [[params.profileMode.buttons]]
+      name = "Contacto"
+      url = "/contacto"
 
   # SEO y social
   description = "Blog técnico sobre desarrollo, programación y tecnología"
