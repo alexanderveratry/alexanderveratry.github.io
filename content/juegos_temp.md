@@ -1712,7 +1712,7 @@ class ColorRush {
         this.playerPos = { row: 5, col: 5 }; // Posición inicial en el centro
         this.targetColor = null;
         this.score = 0;
-        this.timeLeft = 5.0;
+        this.timeLeft = 3.0;
         this.gameRunning = false;
         this.gameStarted = false;
         this.timerInterval = null;
@@ -1814,7 +1814,7 @@ class ColorRush {
         this.generateBoard();
         this.renderBoard();
         this.targetColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-        this.timeLeft = 5.0;
+        this.timeLeft = 3.0;
         
         this.updateTargetColor();
         this.updateTimer();
@@ -2283,7 +2283,7 @@ class ColorRush2 {
         this.playerPos = { row: 5, col: 5 }; // Posición inicial en el centro
         this.targetColor = null;
         this.score = 0;
-        this.timeLeft = 5.0;
+        this.timeLeft = 3.0;
         this.gameRunning = false;
         this.gameStarted = false;
         this.timerInterval = null;
@@ -2423,7 +2423,7 @@ class ColorRush2 {
         this.generateBoard();
         this.renderBoard();
         this.targetColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-        this.timeLeft = 5.0;
+        this.timeLeft = 3.0;
         
         this.updateTargetColor();
         this.updateTimer();
@@ -2456,6 +2456,7 @@ class ColorRush2 {
         this.updateScore();
         this.updateStatus(`¡Correcto! +1 punto`, 'success');
         
+        // Continuar con la siguiente ronda después de 1 segundo
         // Continuar inmediatamente con la siguiente ronda
         if (this.gameRunning) {
             this.startNewRound();
