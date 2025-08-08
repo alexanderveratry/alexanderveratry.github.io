@@ -1414,13 +1414,17 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
     <div id="rush-game-container">
         <div id="rush-game-header">
             <div id="rush-score">🎯 Puntos: 0</div>
+            <div id="rush-best">🏆 Mejor: 0</div>
             <div id="rush-target-color">
                 <span>Color objetivo:</span>
                 <div id="rush-target-display"></div>
                 <div id="rush-target-text">¡Presiona INICIAR!</div>
             </div>
             <div id="rush-timer">⏱️ Tiempo: 3.0s</div>
+            <div id="rush-timer-bar"><div class="rush-progress"></div></div>
             <button id="rush-start-btn" onclick="startColorRush()">🚀 Iniciar Juego</button>
+            <button id="rush-pause-btn" onclick="pauseColorRush()" disabled>⏸️ Pausa</button>
+            <button id="rush-colorblind-btn" onclick="toggleRushColorblind()">👁️ Modo Color</button>
         </div>
         <div id="rush-game-board"></div>
         <div id="rush-game-status"></div>
@@ -1442,6 +1446,15 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
                     <div class="control-key">D</div>
                     <div class="control-desc">Derecha</div>
                 </div>
+            </div>
+            <!-- Controles táctiles para móviles -->
+            <div class="mobile-dpad" aria-hidden="true">
+                <button class="dpad-btn up" data-dir="up" aria-label="Arriba">⬆</button>
+                <div class="middle-row">
+                    <button class="dpad-btn left" data-dir="left" aria-label="Izquierda">⬅</button>
+                    <button class="dpad-btn right" data-dir="right" aria-label="Derecha">➡</button>
+                </div>
+                <button class="dpad-btn down" data-dir="down" aria-label="Abajo">⬇</button>
             </div>
         </div>
     </div>
@@ -1473,6 +1486,12 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
     font-size: 1.2em;
     font-weight: bold;
     color: #2c3e50;
+}
+
+#rush-best {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #8e44ad;
 }
 
 #rush-target-color {
@@ -1540,6 +1559,44 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
     transform: none;
 }
 
+#rush-pause-btn, #rush-colorblind-btn {
+    background: #34495e;
+    border: none;
+    color: #ecf0f1;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+#rush-pause-btn:not(:disabled):hover, #rush-colorblind-btn:hover {
+    background: #2c3e50;
+}
+
+#rush-pause-btn:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+#rush-timer-bar {
+    width: 160px;
+    height: 10px;
+    background: #ecf0f1;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.rush-progress {
+    position: absolute;
+    top: 0; left: 0; height: 100%; width: 100%;
+    background: linear-gradient(90deg, #2ecc71, #27ae60);
+    transition: width .1s linear, background .3s;
+}
+
 #rush-game-board {
     display: grid;
     grid-template-columns: repeat(10, 1fr);
@@ -1571,6 +1628,20 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
 
 .rush-game-cell.blue {
     background: linear-gradient(135deg, #339af0, #228be6);
+}
+
+/* Colorblind mode overlays */
+#rush-game-board.colorblind .rush-game-cell { position: relative; }
+#rush-game-board.colorblind .rush-game-cell::after {
+    content: attr(data-symbol);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.9em;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    pointer-events: none;
 }
 
 .rush-player {
@@ -1644,6 +1715,42 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
     font-weight: bold;
 }
 
+/* D-Pad móvil */
+.mobile-dpad {
+    display: none;
+    margin-top: 10px;
+    user-select: none;
+}
+
+.mobile-dpad .middle-row {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 6px 0;
+}
+
+.dpad-btn {
+    width: 55px;
+    height: 55px;
+    background: #2c3e50;
+    color: #fff;
+    border: 3px solid #3498db;
+    border-radius: 12px;
+    font-size: 1.4em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+    transition: background .2s, transform .1s;
+}
+
+.dpad-btn:active {
+    background: #34495e;
+    transform: scale(.9);
+}
+
 #rush-game-status {
     margin-top: 20px;
     padding: 15px;
@@ -1700,6 +1807,18 @@ Un juego de reacción rápida donde debes moverte por una cuadrícula de colores
         height: 35px;
         font-size: 1em;
     }
+    /* Mostrar D-Pad solo en pantallas táctiles pequeñas */
+    .mobile-dpad {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Detectar dispositivos táctiles (coarse) para mostrar D-Pad aunque no coincida ancho */
+@media (pointer: coarse) and (hover: none) {
+    .mobile-dpad { display: flex; }
 }
 </style>
 
@@ -1712,13 +1831,17 @@ class ColorRush {
         this.playerPos = { row: 5, col: 5 }; // Posición inicial en el centro
         this.targetColor = null;
         this.score = 0;
+    this.bestScore = parseInt(localStorage.getItem('colorRushBest') || '0');
         this.timeLeft = 5.0;
+    this.baseRoundTime = 3.0; // Tiempo inicial por ronda (segundos)
+    this.minRoundTime = 1.2;  // Tiempo mínimo al avanzar
         this.gameRunning = false;
         this.gameStarted = false;
         this.timerInterval = null;
         
         this.initGame();
         this.setupKeyboardControls();
+    this.setupTouchControls();
     }
     
     initGame() {
@@ -1726,7 +1849,9 @@ class ColorRush {
         this.renderBoard();
         this.updateScore();
         this.updateTimer();
-        this.updateStatus("¡Presiona INICIAR para comenzar!", 'waiting');
+    this.updateBestDisplay();
+    this.applySavedColorblind();
+    this.updateStatus("¡Presiona INICIAR para comenzar!", 'waiting');
     }
     
     generateBoard() {
@@ -1747,6 +1872,9 @@ class ColorRush {
             for (let j = 0; j < this.size; j++) {
                 const cell = document.createElement('div');
                 cell.className = `rush-game-cell ${this.board[i][j]}`;
+                if (this.board[i][j] === 'red') cell.setAttribute('data-symbol','R');
+                else if (this.board[i][j] === 'green') cell.setAttribute('data-symbol','G');
+                else if (this.board[i][j] === 'blue') cell.setAttribute('data-symbol','B');
                 
                 // Agregar el jugador si está en esta posición
                 if (i === this.playerPos.row && j === this.playerPos.col) {
@@ -1765,29 +1893,62 @@ class ColorRush {
             if (!this.gameRunning) return;
             
             const key = event.key.toLowerCase();
-            let newRow = this.playerPos.row;
-            let newCol = this.playerPos.col;
-            
-            switch (key) {
-                case 'w':
-                    newRow = Math.max(0, this.playerPos.row - 1);
-                    break;
-                case 's':
-                    newRow = Math.min(this.size - 1, this.playerPos.row + 1);
-                    break;
-                case 'a':
-                    newCol = Math.max(0, this.playerPos.col - 1);
-                    break;
-                case 'd':
-                    newCol = Math.min(this.size - 1, this.playerPos.col + 1);
-                    break;
-                default:
-                    return; // Ignorar otras teclas
-            }
-            
+            let dir = null;
+            if (key === 'w' || key === 'arrowup') dir = 'up';
+            else if (key === 's' || key === 'arrowdown') dir = 'down';
+            else if (key === 'a' || key === 'arrowleft') dir = 'left';
+            else if (key === 'd' || key === 'arrowright') dir = 'right';
+            if (!dir) return;
             event.preventDefault();
-            this.movePlayer(newRow, newCol);
+            this.handleMove(dir);
         });
+    }
+
+    setupTouchControls() {
+        // Botones D-Pad
+        const dpadButtons = document.querySelectorAll('.mobile-dpad .dpad-btn');
+        dpadButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!this.gameRunning) return;
+                const dir = btn.getAttribute('data-dir');
+                this.handleMove(dir);
+            });
+        });
+        // Gestos de swipe sobre el tablero
+        const boardEl = document.getElementById('rush-game-board');
+        if (!boardEl) return;
+        let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+        const minDist = 25; // px
+        boardEl.addEventListener('touchstart', (e) => {
+            if (!this.gameRunning) return;
+            const t = e.changedTouches[0];
+            touchStartX = t.clientX; touchStartY = t.clientY;
+        }, { passive: true });
+        boardEl.addEventListener('touchend', (e) => {
+            if (!this.gameRunning) return;
+            const t = e.changedTouches[0];
+            touchEndX = t.clientX; touchEndY = t.clientY;
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            if (Math.abs(dx) < minDist && Math.abs(dy) < minDist) return; // Muy corto
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // Horizontal
+                this.handleMove(dx > 0 ? 'right' : 'left');
+            } else {
+                // Vertical
+                this.handleMove(dy > 0 ? 'down' : 'up');
+            }
+        }, { passive: true });
+    }
+
+    handleMove(dir) {
+        let newRow = this.playerPos.row;
+        let newCol = this.playerPos.col;
+        if (dir === 'up') newRow = Math.max(0, newRow - 1);
+        else if (dir === 'down') newRow = Math.min(this.size - 1, newRow + 1);
+        else if (dir === 'left') newCol = Math.max(0, newCol - 1);
+        else if (dir === 'right') newCol = Math.min(this.size - 1, newCol + 1);
+        this.movePlayer(newRow, newCol);
     }
     
     movePlayer(newRow, newCol) {
@@ -1803,9 +1964,12 @@ class ColorRush {
         this.gameStarted = true;
         this.score = 0;
         this.playerPos = { row: 5, col: 5 }; // Resetear posición al centro
+    this.updateBestDisplay();
         
         document.getElementById('rush-start-btn').disabled = true;
         document.getElementById('rush-start-btn').textContent = 'Jugando...';
+    const pauseBtn = document.getElementById('rush-pause-btn');
+    if (pauseBtn) { pauseBtn.disabled = false; pauseBtn.textContent = '⏸️ Pausa'; }
         
         this.startNewRound();
     }
@@ -1814,7 +1978,9 @@ class ColorRush {
         this.generateBoard();
         this.renderBoard();
         this.targetColor = this.colors[Math.floor(Math.random() * this.colors.length)];
-        this.timeLeft = 5.0;
+    // Tiempo dinámico: baja ligeramente cada punto hasta un mínimo
+    const dynamic = this.baseRoundTime - this.score * 0.1;
+    this.timeLeft = Math.max(this.minRoundTime, dynamic);
         
         this.updateTargetColor();
         this.updateTimer();
@@ -1844,6 +2010,7 @@ class ColorRush {
     roundSuccess() {
         this.score++;
         this.updateScore();
+    this.updateBestScore();
         this.updateStatus(`¡Correcto! +1 punto`, 'success');
         
         // Continuar con la siguiente ronda después de 1 segundo
@@ -1869,22 +2036,47 @@ class ColorRush {
     gameOver() {
         this.gameRunning = false;
         this.gameStarted = false;
+    this.updateBestScore();
         
         document.getElementById('rush-start-btn').disabled = false;
         document.getElementById('rush-start-btn').textContent = '🚀 Jugar de nuevo';
+    const pauseBtn = document.getElementById('rush-pause-btn');
+    if (pauseBtn) { pauseBtn.disabled = true; pauseBtn.textContent = '⏸️ Pausa'; }
         
         this.updateStatus(`¡Game Over! Puntuación final: ${this.score}`, 'game-over');
         this.updateTargetColor('');
         document.getElementById('rush-target-text').textContent = '¡Presiona JUGAR DE NUEVO!';
+    this.vibrate([80,40,120]);
     }
     
     updateScore() {
         document.getElementById('rush-score').textContent = `🎯 Puntos: ${this.score}`;
     }
+
+    updateBestScore() {
+        if (this.score > this.bestScore) {
+            this.bestScore = this.score;
+            localStorage.setItem('colorRushBest', this.bestScore.toString());
+            this.updateBestDisplay();
+        }
+    }
+
+    updateBestDisplay() {
+        const el = document.getElementById('rush-best');
+        if (el) el.textContent = `🏆 Mejor: ${this.bestScore}`;
+    }
     
     updateTimer() {
         const timeDisplay = Math.max(0, this.timeLeft).toFixed(1);
         document.getElementById('rush-timer').textContent = `⏱️ Tiempo: ${timeDisplay}s`;
+        const bar = document.querySelector('#rush-timer-bar .rush-progress');
+        if (bar && this.roundTotalTime) {
+            const pct = Math.max(0, this.timeLeft / this.roundTotalTime);
+            bar.style.width = (pct * 100) + '%';
+            if (pct < 0.33) bar.style.background = 'linear-gradient(90deg,#e74c3c,#c0392b)';
+            else if (pct < 0.66) bar.style.background = 'linear-gradient(90deg,#f1c40f,#f39c12)';
+            else bar.style.background = 'linear-gradient(90deg,#2ecc71,#27ae60)';
+        }
     }
     
     updateTargetColor(color = this.targetColor) {
@@ -1914,6 +2106,48 @@ class ColorRush {
         statusElement.textContent = message;
         statusElement.className = `rush-status-${type}`;
     }
+
+    vibrate(pattern) {
+        if (navigator && navigator.vibrate) {
+            try { navigator.vibrate(pattern); } catch (_) {}
+        }
+    }
+
+    togglePause() {
+        if (!this.gameStarted) return;
+        const btn = document.getElementById('rush-pause-btn');
+        if (this.gameRunning) {
+            this.gameRunning = false;
+            this.stopTimer();
+            btn.textContent = '▶️ Reanudar';
+            this.updateStatus('Pausado - pulsa Reanudar', 'waiting');
+        } else {
+            this.gameRunning = true;
+            btn.textContent = '⏸️ Pausa';
+            this.updateStatus(`¡Ve al color ${this.getColorName(this.targetColor)}!`, 'playing');
+            this.startTimer();
+        }
+    }
+
+    toggleColorblind() {
+        const board = document.getElementById('rush-game-board');
+        if (!board) return;
+        board.classList.toggle('colorblind');
+        const enabled = board.classList.contains('colorblind');
+        localStorage.setItem('colorRushColorblind', enabled ? '1' : '0');
+        const btn = document.getElementById('rush-colorblind-btn');
+        if (btn) btn.textContent = enabled ? '🎨 Normal' : '👁️ Modo Color';
+    }
+
+    applySavedColorblind() {
+        const saved = localStorage.getItem('colorRushColorblind');
+        if (saved === '1') {
+            const board = document.getElementById('rush-game-board');
+            if (board) board.classList.add('colorblind');
+            const btn = document.getElementById('rush-colorblind-btn');
+            if (btn) btn.textContent = '🎨 Normal';
+        }
+    }
 }
 
 // Inicializar el juego cuando se carga la página
@@ -1931,6 +2165,18 @@ document.addEventListener('DOMContentLoaded', function() {
 function startColorRush() {
     if (colorRush) {
         colorRush.startGame();
+    }
+}
+
+function pauseColorRush() {
+    if (colorRush) {
+        colorRush.togglePause();
+    }
+}
+
+function toggleRushColorblind() {
+    if (colorRush) {
+        colorRush.toggleColorblind();
     }
 }
 </script>
